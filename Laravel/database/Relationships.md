@@ -57,31 +57,54 @@ $user = Post::find(1)->user; // Get the associated user
 ```
 
 ### 3. Many To Many
-**توضیح**: چندین مدل به چندین مدل دیگر از طریق جدول واسطه مرتبط هستند (مثلاً کاربران و نقش‌ها).
+**توضیح**: چندین مدل به چندین مدل دیگر از طریق جدول واسطه(pivot-table) مرتبط هستند (مثلاً کاربران و نقش‌ها).
 - **متد**: `belongsToMany` (برای هر دو مدل).
 ```php ln=false
 // App/Models/User.php
-public function roles()
+// Define a many-to-many relationship with Role
+class User extends Model → public function roles()
 {
-    // Define a many-to-many relationship with Role
-    return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');//third-table, local-key, foreign-key
+    return $this->belongsToMany(
+    ​	Role::class, //joinTo: targetModel
+    ​	$pivotTable='role_user' = alphabatic-order-pivotTableName,
+    ​	$foreignPivotKey='user_id' //foreignPivotKey related to $thisModel
+    ​	$foreignPivotKey='role_id', //foreignPivotKey related to targetModel
+    ​	$primaryKey = 'id' //$thisModel
+    ​	$primaryKey = 'id' //targetModel
+    )
+    //use1: foreach ($user->roles as $role) {}
+    //use2: roles() method
+    //   $roles = User::find(1)->roles()->orderBy('name')->get();
+    //   $user->roles()->attach(1);
+        
+    ->using(RoleUser::class) //Custom many-to-many pivot Model: methods, casts etc.
+    // app\model\RoleUser.php → class RoleUser extends Pivot {public $incrementing = true;}
+    
+    -> withPivot ('column1',,)
+    // use: $user -> role -> pivot -> column1;
+    -> as('aliasToPivot') // $user -> role -> aliasName -> column1;
+    -> withTimeStamps () //$user-> role-> pivot -> created_at;
+    
+    ->wherePivot('approved', 1)
+    ->wherePivotIn('priority', [1, 2])
+    ->wherePivotNotIn('priority', [1, 2])
+    ->wherePivotBetween('created_at', ['2020-01-01 00:00:00', '2020-12-31 00:00:00'])
+    ->wherePivotNotBetween('created_at', ['2020-01-01 00:00:00', '2020-12-31 00:00:00'])
+    ->wherePivotNull('expired_at')
+    ->wherePivotNotNull('expired_at')
+    
+    ->orderByPivot('created_at', 'desc')
+    ;  	
 }
 
 // App/Models/Role.php
-public function users()
+// Define a many-to-many relationship with User
+class Role extend Model → public function users()
 {
-    // Define a many-to-many relationship with User
-    return $this->belongsToMany(User::class, 'role_user', 'role_id', 'user_id');
+    return $this->belongsToMany(User::class, ='role_user', ='user_id', ='id');
 }
 ```
-
-- **استفاده**:
-```php ln=false
-$user = User::find(1);
-$roles = $user->roles; // Get all roles for the user
-$user->roles()->attach(1); // Attach role with ID 1 to the user
-```
-
+وقتی در لاراول یک رابطه‌ی `belongsToMany` تعریف می‌کنی، لاراول به صورت پیش‌فرض فقط ستون‌های کلید خارجی را از جدول میانی (**pivot table**) بارگذاری می‌کند. یعنی فقط role_id, user_id از جدول pivot. برای گرفتن بقیه‌ی ستون‌های جدول میانی (`assigned_by`, `assigned_at`) باید از متد withPivot استفاده کرد.
 ### 4. Has One Through
 **توضیح**: یک مدل به یک مدل دیگر از طریق یک مدل واسطه مرتبط است (مثلاً یک کاربر یک آدرس دارد از طریق پروفایل).
 - **متد**: `hasOneThrough`.

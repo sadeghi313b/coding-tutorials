@@ -1,5 +1,5 @@
 # Localhost
-browser>> https://localhost/phpmyadmin
+browser: https://localhost/phpmyadmin
 # Factory
 ## Definition
 با متد definition خروجی متداول و پیش فرض فکتوری مشخص می شود:
