@@ -8,6 +8,19 @@
 \>> cd \<project-name>
 \>> npm $\frac{install}{i}$ vue@latest
 
+---
+# npm's
+## ziggy
+استفاده از روتهای لاراول در سمت فرانت
+npm install ziggy-js
+
+add `@routes` to app.blade.php befor \</head> tag
+
+//ziggy in app.js
+import { ZiggyVue } from 'ziggy-js'
+import { Ziggy } from './ziggy'
+
+---
 # vs-code from cmd
 \>> code .
 # client-side

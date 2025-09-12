@@ -1,3 +1,152 @@
+
+
+
+# Access Collection
+```php ln=false title=
+$value = $record->get($field); // Returns null if not exists
+$value = $record->get($field, 'default'); // With default value
+**Dot notation support** - `get('relation.field')`
+
+// Property Access (If attribute exists)
+$value = $record->$field; // Direct property access
+$value = $record->{$field}; // For dynamic field names
+```
+
+
+---
+```php ln=false title=Objects
+// initialing
+$object = {}
+$object = (object)[]
+$object = new /stdClass
+$object = json_decode('{}');
+
+//clear an existing object
+$object = new /stdClass  //re-assign to New `stdClass
+$object = (object) [];
+$object = json_decode('{}');
+
+$object -> {$key} = $value;
+// Overwrites existing 'name' if key exist
+// or push if key does not exist
+
+foreach ($data as $key => $value) { $object->{$key} = $value; }
+$array = []; foreach ($data as $key => $value) { $array[$key] = $value; } 
+​	$object = (object) $array;
+foreach ($data as $key => $value) {
+    if (!property_exists($object, $key)) {
+        $object -> {$key} = $value;
+    }
+}
+```
+
+```php ln=false title=Input/Outpot
+$data = ['name' => 'John', 'age' => 30, 'city' => 'New York'];
+
+$object is now:
+{
+    "name": "John",
+    "age": 30,
+    "city": "New York"
+}
+```
+
+**`stdClass`** is PHP's **generic empty class** - a built-in class that serves as a blank object for dynamic property assignment.
+```php ln=false title=
+$object = new \stdClass();
+$object->name = 'John';
+$object->age = 30;
+
+$array = ['name' => 'Jane', 'age' => 25];
+$object = (object) $array; // Creates stdClass object
+```
+
+---
+$users = $query->paginate(5); // Returns LengthAwarePaginator object
+Your code has a **critical issue**. You cannot use `find()` on a `LengthAwarePaginator` object.
+```php ln=false title=SUMMARY
+$paginator-> items():array | toArray():array | getCollection():collection |
+```
+
+
+**Pagination Methods (Chainable)**
+->withPath($path)          // Set custom base path
+->withQueryString()        // Include all current query string values
+->appends($array)          // Add query string parameters
+->fragment($fragment)      // Add URL fragment (#section)
+Since the paginator contains a collection of items, you can chain collection methods by first accessing the collection:
+// Method 1: Transform items then continue pagination
+->through(function($item) {
+    // Modify each item
+    return $item;
+})
+// Method 2: Get collection, modify, then set back
+->setCollection($collection->map(function($item) {
+    // Modify items
+    return $item;
+}))
+## 1. **Convert to Collection**
+```php ln=false title=
+$paginator = User::paginate(5);
+
+// Method 1: Get the underlying collection
+$collection = $paginator->getCollection();
+// Returns: Illuminate\Support\Collection
+
+// Method 2: Use items() method
+$collection = collect($paginator->items());
+// Returns: Illuminate\Support\Collection
+
+// Method 3: Direct conversion
+$collection = collect($paginator->items());
+```
+## 2. **Convert to Array**
+```php ln=false title=
+$paginator = User::paginate(5);
+
+// Method 1: Get array of items only
+$array = $paginator->items();
+/* Returns: array of models/items
+// Output:
+[
+    ['name' => 'John Doe', 'email' => 'john@example.com', 'phone' => '+1-555-1234567'],
+    ['name' => 'Jane Smith', 'email' => 'jane@example.com', 'phone' => '+1-444-9876543'],
+    ['name' => 'Bob Johnson', 'email' => 'bob@example.com', 'phone' => '+1-333-4567890']
+]
+*/
+
+// Method 2: Get complete pagination data as array
+$fullArray = $paginator->toArray();
+/* Returns:
+[
+    'current_page' => 1,
+    'data' => [...], // Your items here
+    'first_page_url' => '...',
+    'from' => 1,
+    'last_page' => 3,
+    'last_page_url' => '...',
+    'links' => [...],
+    'next_page_url' => '...',
+    'path' => '...',
+    'per_page' => 5,
+    'prev_page_url' => null,
+    'to' => 5,
+    'total' => 12
+]
+*/
+
+// Method 3: Get only the data array
+$dataArray = $paginator->toArray()['data'];
+```
+
+<hr>
+
+```php ln=false title=
+$collection -> getAttribute() : array
+$collection -> getRelation() : array
+```
+
+---
 # Resource controller
 در لاراول وقتی از **Resource Collection** استفاده می‌کنید (مثل `StudentResource::collection(...)`)، خروجی به شکل زیر برمی‌گردد:
 ```php ln=false
@@ -118,3 +267,10 @@ $user = User::factory()->suspended()->create();
 $user = User::factory()->trashed()->create();
 ```
 متد trashed یک متد درونی در لاراول است که اتریبیوت soft-delete را طوری تنظیم میکند که رکورد soft delete شده تولید شود.
+
+---
+
+public function index(Request $request)
+اگر شما `$request` رو بدون type-hint نوشتید، لاراول فکر می‌کنه قراره مقدار از route parameter بیاد.  
+مثلا `/users/{request}` → که اینجا وجود نداره.
+آنگاه اگر در روت نیز هیچ پارامتری به کنترلر پاس نداده باشید آنگاه خطا خواهد داد. 

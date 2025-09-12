@@ -7,19 +7,27 @@
 public function profile()
 {
     // Define a one-to-one relationship with Profile
-    return $this->hasOne(Profile::class, 'user_id');
-    //hasOne(ohterModel, foreign-key, loacal-key)
+    return $this->hasOne(Profile::class, $targetKey='user_id',$localKey='id');
+    //this has one related - goto targetKey - equals localKey
+}
+public function related() {
+​	return $this -> hasOne(Related::class, $keyhole, $key)
 }
 
 // App/Models/Profile.php
 public function user()
 {
     // Define the inverse one-to-one relationship with User
-    return $this->belongsTo(User::class, 'user_id');
-    //belongsTo(ohterModel, foreign-key, owner-key)
+    return $this->belongsTo(User::class, $localKey='user_id', $targetKey='id');
+    //this bolongs to related - by localKey - equals targetKey
+}
+public function related() {
+​	return $this -> belongTo(Related::class, $key, $keyhole)
 }
 ```
-اگر فقط از سمت User به Profile نیاز دارید (مثل $user->profile)، نیازی به تعریف رابطه معکوس در Profile نیست.
+- key is in local table = some filed
+- keyhole is in related(target) table = some field
+- اگر فقط از سمت User به Profile نیاز دارید (مثل $user->profile)، نیازی به تعریف رابطه معکوس در Profile نیست.
 
 - **استفاده**:
 ```php ln=false
@@ -105,6 +113,9 @@ class Role extend Model → public function users()
 }
 ```
 وقتی در لاراول یک رابطه‌ی `belongsToMany` تعریف می‌کنی، لاراول به صورت پیش‌فرض فقط ستون‌های کلید خارجی را از جدول میانی (**pivot table**) بارگذاری می‌کند. یعنی فقط role_id, user_id از جدول pivot. برای گرفتن بقیه‌ی ستون‌های جدول میانی (`assigned_by`, `assigned_at`) باید از متد withPivot استفاده کرد.
+
+نکته مهم: اگر یک مدل مستقل برای RoleUser درست کنیم آنگاه لاراول طبق قواعدش همیشه با صدا زدن این مدل، جدول role_users را برایش در نظر می‌گیرد درحالیکه جدول ما role_user به شکل مفرد است. برای حل این مشکل باید در مدل RoleUser خط زیر را درون کلاس RoleUser Class برای تصریح نام جدول خارج از قواعد داشته باشیم:
+protected $table = 'role_user';
 ### 4. Has One Through
 **توضیح**: یک مدل به یک مدل دیگر از طریق یک مدل واسطه مرتبط است (مثلاً یک کاربر یک آدرس دارد از طریق پروفایل).
 - **متد**: `hasOneThrough`.

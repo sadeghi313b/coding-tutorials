@@ -27,6 +27,7 @@ function foo(?string $name): ?int {
 ```php ln=false title=
 $value = $_GET['name'] ?? 'Guest'; //isset($_GET['name']) ? $_GET['name'] : 'Guest'
 ```
+در **JS و PHP** `??` فقط به `null/undefined` حساس است، نه سایر مقادیر Falsy مثل `0` یا `''`. هر گاه مقدار اول null یا undefined بود آنگاه مقدار دوم برگردانده می‌شود.
 ### Ternary Operator کوتاه (?:)
 نسخه کوتاه ternary برای بررسی شرط: - بررسی می‌کند آیا **مقدار متغیر "true-like"** است یا نه. یعنی null، false، 0، "" (رشته خالی) و [] (آرایه خالی) همه **false** محسوب می‌شوند.
 ```php ln=false title=
