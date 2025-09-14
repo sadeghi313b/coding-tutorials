@@ -1,6 +1,20 @@
 
 
+---
+# ارسال داده به بک اند
+در لاراول، وقتی داده‌ها را با `data: { ids }` به بک‌اند می‌فرستید، در کنترلر می‌توانید به چند روش به آن دسترسی داشته باشید:
+1. مستقیم با نام کلید:
+```php
+$ids = $request->ids;
+```
+2. با متد `input()` و مقدار پیش‌فرض:
+```php
+$ids = $request->input('ids', []); // اگر کلید موجود نبود، آرایه خالی برمی‌گردد
+```
+تفاوت اصلی این است که `input()` به شما امکان می‌دهد مقدار پیش‌فرض تعریف کنید تا از خطا جلوگیری شود، مخصوصاً وقتی ممکن است کلید `ids` در درخواست وجود نداشته باشد.
+اگر بخواهید، می‌توانم یک نمونه کامل از **متد bulkDestroy در کنترلر** با همین منطق برای حذف چند رکورد بنویسم.
 
+---
 # Access Collection
 ```php ln=false title=
 $value = $record->get($field); // Returns null if not exists
@@ -10,6 +24,16 @@ $value = $record->get($field, 'default'); // With default value
 // Property Access (If attribute exists)
 $value = $record->$field; // Direct property access
 $value = $record->{$field}; // For dynamic field names
+```
+
+The error occurs because you're using `$record->has($field)` on an Eloquent model, but **`has()` is a relationship method**, not a field existence checker.
+```php ln=false title=
+//has field
+property_exists($record, $field)
+is_null($record->getAttribute($field))
+
+//has relation
+$record->has($field)
 ```
 
 
@@ -62,6 +86,7 @@ $object = (object) $array; // Creates stdClass object
 ```
 
 ---
+# Paginator
 $users = $query->paginate(5); // Returns LengthAwarePaginator object
 Your code has a **critical issue**. You cannot use `find()` on a `LengthAwarePaginator` object.
 ```php ln=false title=SUMMARY
@@ -85,7 +110,7 @@ Since the paginator contains a collection of items, you can chain collection met
     // Modify items
     return $item;
 }))
-## 1. **Convert to Collection**
+# 1. **Convert to Collection**
 ```php ln=false title=
 $paginator = User::paginate(5);
 
