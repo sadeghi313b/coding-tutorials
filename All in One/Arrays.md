@@ -168,7 +168,7 @@ array_merge(array ...$arrays)
 $all = array_merge([1,2],[3,4]);
 </pre></details>
 <details dir="ltr"><summary style="overflow-x: auto;white-space: nowrap;">
-array.concat(...values: ConcatArray<any>[])  
+array.concat(...values: ConcatArray&lt;any&gt;[])  
 <span style="color:gray;">: any[] // merged array</span>  
 </summary>
 <bdi class="fa">چند آرایه را با هم ترکیب می‌کند</bdi>
@@ -235,5 +235,5 @@ array.reduce(callback: (acc:any,cur:any)=>any, initialValue:any)
 </summary>
 <bdi class="fa">آرایه را به یک مقدار واحد کاهش می‌دهد</bdi>
 <pre style="font-size: 12px">
-let sum = [1,2,3].reduce((a,b)=>a+b,0);
+let sum = [1,2,3].reduce((total,x)=>total+x,0);
 </pre></details>

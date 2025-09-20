@@ -38,7 +38,6 @@ enum OrderStatus: string
 }
 ```
 
-
 ```php ln=false title=
 //Model
 protected $casts = [ 'status' => OrderStatus::class, ];
@@ -48,14 +47,16 @@ return [ 'status' => ['required', new Enum(OrderStatus::class)], ];
 
 //send to front
 OrderStatus::options()
-[
-  {"label": "Active", "value": "active"},
-  {"label": "Force", "value": "force"},
-  {"label": "On Hold", "value": "hold"},
-  {"label": "Canceled", "value": "canceled"},
-  {"label": "Enough", "value": "enough"}
-]
+// [
+//   {"label": "Active", "value": "active"},
+//   {"label": "Force", "value": "force"},
+//   {"label": "On Hold", "value": "hold"},
+//   {"label": "Canceled", "value": "canceled"},
+//   {"label": "Enough", "value": "enough"}
+// ]
 
 //usage
 $status = OrderStatus::Active; echo $status->label();
+echo $user->status->lable();
 ```
+در واقع `$user->status` یک نمونه از enum UserStatus (نه یک رشته ساده).

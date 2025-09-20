@@ -79,3 +79,59 @@ class Helper {
 }
 ```
 ---
+با سلام
+
+سؤال خیلی خوبی پرسیدی 👌  
+ببین تفاوت **static method** و **instance method** در enum اینجاست:
+
+---
+
+### 1. متد **instance** مثل `public function label()`
+
+- نیاز دارد که یک نمونه (case) از enum داشته باشی.
+    
+- یعنی اول بگویی `OrderStatus::Active` و بعد روی آن نمونه صدا بزنی:
+    
+
+```php
+$status = OrderStatus::Active;
+echo $status->label(); // باید نمونه داشته باشی
+```
+
+اینجا منطقی است چون label به **مقدار فعلی enum** بستگی دارد (`$this`).  
+اگر استاتیک باشد دیگر `$this` در دسترس نیست.
+
+---
+
+### 2. متد **static**
+
+- متدی است که برای کار روی **کل enum** نوشته می‌شود، نه روی یک case خاص.
+    
+- مثلاً وقتی می‌خواهی همه مقادیر یا همه labels را یکجا برگردانی:
+    
+
+```php
+public static function labels(): array
+{
+    return [
+        self::Active->value   => self::Active->label(),
+        self::Force->value    => self::Force->label(),
+        self::Hold->value     => self::Hold->label(),
+        self::Canceled->value => self::Canceled->label(),
+        self::Enough->value   => self::Enough->label(),
+    ];
+}
+```
+
+و استفاده:
+
+```php
+$allLabels = OrderStatus::labels();
+// خروجی: ['active' => 'Active', 'force' => 'Force', ...]
+```
+### Summary
+
+```php ln=false title=
+public function fnc() { ..$this.. } // $instnc = clss::mthd|prpt //Gender::Male
+public static function fnc() { alls } //no $this
+```
